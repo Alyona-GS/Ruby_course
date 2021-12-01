@@ -1,1 +1,1 @@
-For a studying purposes
+For studying purposes
