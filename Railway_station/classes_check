@@ -5,26 +5,40 @@ st4 = Station.new("Kazan")
 st5 = Station.new("Tomsk")
 r1 = Route.new(st1, st2)
 r1.add_station(st3)
-r1.print
-r1.add_station(st4, 1)
-r1.print
+r1.stations
+r1.add_station(st4)
+r1.stations
 r1.delete_station(st4)
-r1.print
-t1 = Train.new("1", "p", 12)
+r1.stations
+t1 = Train.new("1", "passenger", 12)
 t1.receive_route(r1)
 t1.station
-st1.atm_trains
-st1.atm_trains_by_type
+st1.trains
+st1.trains_by_type("passenger")
 t1.next_station
 t1.previous_station
 t1.speed
-t1.change_wagons("add")
-t1.change_wagons("remove")
-t1.go
-t1.change_wagons("add")
+t1.add_wagons
+t1.remove_wagons
+t1.speed_up(100)
+t1.add_wagons
 t1.speed
 t1.stop
 t1.speed
-t1.train_wagons
-t1.move("forward")
-
+t1.wagons_count
+t1.move_forward
+t1.station
+t1.next_station
+t1.previous_station
+t1.move_forward
+t1.station
+t1.next_station
+t1.previous_station
+t1.move_backward
+t1.station
+t1.next_station
+t1.previous_station
+t1.move_backward
+t1.station
+t1.next_station
+t1.previous_station
