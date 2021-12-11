@@ -1,41 +1,15 @@
 class Train
-  attr_reader :type, :speed, :wagons_count
+  #public cause the user uses this
+  attr_reader :type, :name
 
-  def initialize(number, type, wagons_count)
-    @number = number
-    @type = type if type == "passenger" || type == "cargo"
-    @wagons_count = wagons_count
-
+  def initialize(name)
+    @name = name
     @speed = 0
-  end
-
-  #getters for stations
-  def station
-    @route.stations[@current_station_index]
-  end
-
-  def next_station
-    @route.stations[@current_station_index + 1]
-  end
-
-  def previous_station
-    @route.stations[@current_station_index - 1] if @current_station_index > 0
-  end
-
-  def speed_up(speed)
-    @speed = speed
-  end
-
-  def stop
-    @speed = 0
-  end
-
-  def add_wagons
-    @wagons_count += 1 if @speed == 0
+    @wagons = []
   end
 
   def remove_wagons
-    @wagons_count -= 1 if @speed == 0 && @wagons_count > 0
+    @wagons.delete_at(-1) if @speed.zero? && @wagons.any?
   end
 
   def receive_route(route)
@@ -58,5 +32,29 @@ class Train
       @current_station_index -= 1 
       @route.stations[@current_station_index].train_arrival(self)
     end
+  end
+
+  protected #cause user does not access this directly but subclasses are
+  attr_reader :speed, :wagons
+
+  private #cause user and the other parts of the program do not use it
+  def station
+    @route.stations[@current_station_index]
+  end
+
+  def speed_up(speed)
+    @speed = speed
+  end
+
+  def stop
+    @speed = 0
+  end
+
+  def next_station
+    @route.stations[@current_station_index + 1]
+  end
+
+  def previous_station
+    @route.stations[@current_station_index - 1] if @current_station_index > 0
   end
 end

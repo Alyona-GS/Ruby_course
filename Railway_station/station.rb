@@ -1,4 +1,5 @@
 class Station
+  #the user access this so public
   attr_accessor :name
   attr_reader :trains
 
@@ -7,6 +8,7 @@ class Station
     @trains = []
   end
 
+  #public because class Train access it
   def train_departure(train)
     @trains.delete(train)
   end
@@ -15,6 +17,8 @@ class Station
     @trains << train
   end
 
+  #private cause not used elsewhere
+  private
   def trains_by_type(type)
     @trains.select { |train| train.type == type }.count
   end
