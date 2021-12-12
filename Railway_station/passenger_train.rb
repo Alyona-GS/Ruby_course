@@ -4,8 +4,4 @@ class PassengerTrain < Train
     super
     @type = "passenger"
   end
-
-  def add_wagons
-    self.wagons << PassengerWagon.new if @speed.zero?
-  end
 end

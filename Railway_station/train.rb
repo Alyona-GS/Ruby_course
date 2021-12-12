@@ -8,6 +8,10 @@ class Train
     @wagons = []
   end
 
+  def add_wagons(wagon)
+    self.wagons << wagon if @speed.zero?
+  end
+
   def remove_wagons
     @wagons.delete_at(-1) if @speed.zero? && @wagons.any?
   end

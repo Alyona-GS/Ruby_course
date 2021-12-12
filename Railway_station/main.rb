@@ -6,13 +6,111 @@ require_relative 'cargo_train'
 require_relative 'passenger_wagon'
 require_relative 'cargo_wagon'
 
-stations = []
-trains = []
-routes = []
+@stations = []
+@trains = []
+@routes = []
 
 #public, no class is in here
 def find_obj(obj, obj_arr)
   obj_arr.find { |x| x.name == obj }
+end
+
+def create_station
+  print "Put the name of the station: "
+  name = gets.chomp
+
+  @stations << Station.new(name)
+end
+
+def create_train
+  print "Which type of train to create? (passenger/cargo): "
+  type = gets.chomp
+  print "Print the number of the train: "
+  number = gets.chomp
+
+  @trains << PassengerTrain.new(number) if type == "passenger"
+  @trains << CargoTrain.new(number) if type == "cargo"
+end
+
+def create_route
+  puts "Print name, initial station and destination (each on a new string):"
+  name = gets.chomp
+  first_station = find_obj(gets.chomp, @stations)
+  last_station = find_obj(gets.chomp, @stations)
+
+  @routes << Route.new(name, first_station, last_station)
+
+  puts "Route #{@routes.last.name} has been created!"
+end
+
+def insert_station
+  print "Which route do you want to update? "
+  route = find_obj(gets.chomp, @routes)
+  print "The name of the station to be added: "
+  station = find_obj(gets.chomp, @stations)
+
+  route.add_station(station)
+
+  puts "Your route:"
+  route.stations.each { |station| puts station.name }
+end
+
+def remove_station
+  print "Which route do you want to update? "
+  route = find_obj(gets.chomp, @routes)
+  print "The name of the station to be removed: "
+  station = find_obj(gets.chomp, @stations)
+
+  route.delete_station(station)
+
+  puts "Your route:"
+  route.stations.each { |station| puts station.name }
+end
+
+def bind_route
+  puts "Print the route and a train you do want to bind (each on a new string):"
+  route = find_obj(gets.chomp, @routes)
+  train = find_obj(gets.chomp, @trains)
+
+  train.receive_route(route)
+end
+
+def add_wagon
+  print "Number of train: "
+  train = find_obj(gets.chomp, @trains)
+  wagon = PassengerWagon.new if train.type == "passenger"
+  wagon = CargoWagon.new if train.type == "cargo" 
+
+  train.add_wagons(wagon)
+end
+
+def remove_wagon
+  print "Number of train: "
+  train = find_obj(gets.chomp, @trains)
+
+  train.remove_wagons
+end
+
+def move_train
+  print "Number of train you want to move: "
+  train = find_obj(gets.chomp, @trains)
+  print "Backward or forward? (backward/forward): "
+  input = gets.chomp
+
+  train.move_forward if input == "forward"
+  train.move_backward if input == "backward"
+end
+
+def print_stations
+  puts "Stations:"
+  @stations.each { |station| puts station.name }
+end
+
+def print_trains
+  print "Station, please: "
+  station = find_obj(gets.chomp, @stations)
+  puts "list of the trains: "
+  station.trains.each { |train| puts train.name }
 end
 
 loop do
@@ -32,79 +130,27 @@ loop do
   number = gets.chomp.to_i
   case number
   when 1
-    print "Put the name of the station: "
-    name = gets.chomp
-
-    stations << Station.new(name)
+    create_station
   when 2
-    print "Which type of train to create? (passenger/cargo): "
-    type = gets.chomp
-    print "Print the number of the train: "
-    number = gets.chomp
-
-    trains << PassengerTrain.new(number) if type == "passenger"
-    trains << CargoTrain.new(number) if type == "cargo"
+    create_train
   when 3
-    puts "Print name, initial station and destination (each on a new string):"
-    name = gets.chomp
-    first_station = find_obj(gets.chomp, stations)
-    last_station = find_obj(gets.chomp, stations)
-
-    routes << Route.new(name, first_station, last_station)
-
-    puts "Route #{routes.last.name} has been created!"
+    create_route
   when 4
-    print "Which route do you want to update? "
-    route = find_obj(gets.chomp, routes)
-    print "The name of the station to be added: "
-    station = find_obj(gets.chomp, stations)
-
-    route.add_station(station)
-
-    puts "Your route:"
-    route.stations.each { |station| puts station.name }
+    insert_station
   when 5
-    print "Which route do you want to update? "
-    route = find_obj(gets.chomp, routes)
-    print "The name of the station to be removed: "
-    station = find_obj(gets.chomp, stations)
-
-    route.delete_station(station)
-
-    puts "Your route:"
-    route.stations.each { |station| puts station.name }
+    remove_station
   when 6
-    puts "Print the route and a train you do want to bind (each on a new string):"
-    route = find_obj(gets.chomp, routes)
-    train = find_obj(gets.chomp, trains)
-
-    train.receive_route(route)
+    bind_route
   when 7
-    print "Number of train: "
-    train = find_obj(gets.chomp, trains)
-
-    train.add_wagons
+    add_wagon
   when 8
-    print "Number of train: "
-    train = find_obj(gets.chomp, trains)
-
-    train.remove_wagons
+    remove_wagon
   when 9
-    print "Number of train you want to move: "
-    train = find_obj(gets.chomp, trains)
-    print "Backward or forward? (backward/forward): "
-    input = gets.chomp
-
-    train.move_forward if input == "forward"
-    train.move_backward if input == "backward"
+    move_train
   when 10
-    puts "Stations:"
-    stations.each { |station| puts station.name }
+    print_stations
   when 11
-    print "Station, please: "
-    station = find_obj(gets.chomp, stations)
-    puts "list of the trains: "
-    station.trains.each { |train| puts train.name }
+    print_trains
   when 0
     break
   end

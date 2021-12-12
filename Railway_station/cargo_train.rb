@@ -4,8 +4,4 @@ class CargoTrain < Train
     super
     @type = "cargo"
   end
-
-  def add_wagons
-    self.wagons << CargoWagon.new if @speed.zero?
-  end
 end
