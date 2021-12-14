@@ -1,14 +1,22 @@
 class Station
-  #the user access this so public
+  include InstanceCounter
+
   attr_accessor :name
   attr_reader :trains
+
+  @@stations = []
+
+  def self.all
+    @@stations #and if not global?
+  end
 
   def initialize(name)
     @name = name
     @trains = []
+    @@stations << self
+    register_instances
   end
 
-  #public because class Train access it
   def train_departure(train)
     @trains.delete(train)
   end
@@ -17,8 +25,8 @@ class Station
     @trains << train
   end
 
-  #private cause not used elsewhere
   private
+
   def trains_by_type(type)
     @trains.select { |train| train.type == type }.count
   end

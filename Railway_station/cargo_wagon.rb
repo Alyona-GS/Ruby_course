@@ -1,5 +1,4 @@
-class CargoWagon
-  #public cause class CargoTrain uses this
+class CargoWagon < Wagon
   attr_reader :type
 
   def initialize

@@ -1,11 +1,20 @@
 class Train
-  #public cause the user uses this
+  include InstanceCounter
+
   attr_reader :type, :name
+
+  @@trains = []
+
+  def self.find(name)
+    @@trains.find { |x| x.name == name }
+  end
 
   def initialize(name)
     @name = name
     @speed = 0
     @wagons = []
+    @@trains << self
+    register_instances
   end
 
   def add_wagons(wagon)
@@ -39,6 +48,7 @@ class Train
   end
 
   protected #cause user does not access this directly but subclasses are
+  include CompanyName
   attr_reader :speed, :wagons
 
   private #cause user and the other parts of the program do not use it

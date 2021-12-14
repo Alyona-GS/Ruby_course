@@ -1,11 +1,12 @@
 class Route
-  #all methods are public because the user needs to access them by himself (with the help of an interface)
-  #stations are public too because other part of program accesses it
+  include InstanceCounter
+
   attr_reader :stations, :name
 
   def initialize(name, first_station, last_station)
     @name = name
     @stations = [first_station, last_station]
+    register_instances
   end
 
   def add_station(station)

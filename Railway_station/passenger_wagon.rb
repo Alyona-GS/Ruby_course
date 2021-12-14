@@ -1,4 +1,4 @@
-class PassengerWagon
+class PassengerWagon < Wagon
   #public cause class PassengerTrain uses this
   attr_reader :type
 
