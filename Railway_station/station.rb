@@ -7,7 +7,7 @@ class Station
   @@stations = []
 
   def self.all
-    @@stations #and if not global?
+    @@stations
   end
 
   def initialize(name)
@@ -15,6 +15,7 @@ class Station
     @trains = []
     @@stations << self
     register_instances
+    validate!
   end
 
   def train_departure(train)
@@ -23,6 +24,19 @@ class Station
 
   def train_arrival(train)
     @trains << train
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
+  end
+
+  protected
+
+  def validate!
+    raise "The name of the city should be at least 3 letter length!" if @name.length < 3
   end
 
   private

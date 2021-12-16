@@ -35,26 +35,40 @@ def create_station
   print "Put the name of the station: "
   name = gets.chomp
   Station.new(name)
+  puts "The station #{name} has been created!"
+  rescue StandardError => e
+    puts e.message
+    retry
 end
 
 def create_train
   print "Which type of train to create? (passenger/cargo): "
   type = gets.chomp
+  raise "The type is incorrect!" unless type == "passenger" || type == "cargo"
+
   print "Print the number of the train: "
   number = gets.chomp
+
   PassengerTrain.new(number) if type == "passenger"
   CargoTrain.new(number) if type == "cargo"
+  puts "The #{type} train #{number} has been created!"
+  rescue StandardError => e
+    puts e.message
+    retry
 end
 
 def create_route
   puts "Print name, initial station and destination (each on a new string):"
   name = gets.chomp
+  #raise "There is no such "
   first_station = find_obj(gets.chomp, Station.all)
   last_station = find_obj(gets.chomp, Station.all)
 
   @routes << Route.new(name, first_station, last_station)
-
-  puts "Route #{@routes.last.name} has been created!"
+  puts "Route #{name} has been created!"
+  rescue StandardError => e
+    puts e.message
+    retry
 end
 
 def insert_station

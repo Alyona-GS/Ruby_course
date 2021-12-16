@@ -1,20 +1,22 @@
 class Train
   include InstanceCounter
 
-  attr_reader :type, :name
+  attr_reader :type, :name, :trains
 
+  NUMBER_FORMAT = /^([a-z]|\d){3}-?([a-z]|\d){2}$/i
   @@trains = []
 
-  def self.find(name)
-    @@trains.find { |x| x.name == name }
+  def self.find(number)
+    @@trains.find { |x| x.number == number }
   end
 
-  def initialize(name)
-    @name = name
+  def initialize(number)
+    @number = number
     @speed = 0
     @wagons = []
     @@trains << self
     register_instances
+    validate!
   end
 
   def add_wagons(wagon)
@@ -47,11 +49,24 @@ class Train
     end
   end
 
-  protected #cause user does not access this directly but subclasses are
+  def valid?
+    validate!
+    true
+  rescue
+    false
+  end
+
+  protected
+
   include CompanyName
   attr_reader :speed, :wagons
 
-  private #cause user and the other parts of the program do not use it
+  def validate!
+    raise "Number is invalid! Should be either xxx-xx or xxxxx" if @number !~ NUMBER_FORMAT
+  end
+
+  private
+
   def station
     @route.stations[@current_station_index]
   end
