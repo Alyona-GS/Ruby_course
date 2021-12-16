@@ -8,8 +8,8 @@ class Route
   def initialize(name, first_station, last_station)
     @name = name
     @stations = [first_station, last_station]
-    register_instances
     validate!
+    register_instances
   end
 
   def add_station(station)
@@ -30,8 +30,10 @@ class Route
   protected
 
   def validate!
-    raise "The format of route is invalid. Should be: XXX-XXX" if @name !~ ROUTE_FORMAT
-    raise "There is no such first station!" unless Station.all.include?(self.stations.first)
-    raise "There is no such last station!" unless Station.all.include?(self.stations.last)
+    errors = []
+    errors << "The format of route is invalid. Should be: XXX-XXX" if @name !~ ROUTE_FORMAT
+    errors << "There is no such first station!" unless Station.all.include?(self.stations.first)
+    errors << "There is no such last station!" unless Station.all.include?(self.stations.last)
+    raise errors.join(";") unless errors.empty?
   end
 end

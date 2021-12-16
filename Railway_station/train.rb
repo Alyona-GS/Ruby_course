@@ -14,9 +14,9 @@ class Train
     @number = number
     @speed = 0
     @wagons = []
+    validate!
     @@trains << self
     register_instances
-    validate!
   end
 
   def add_wagons(wagon)
