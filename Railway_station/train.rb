@@ -1,7 +1,7 @@
 class Train
   include InstanceCounter
 
-  attr_reader :type, :name, :trains
+  attr_reader :type, :number, :trains, :wagons
 
   NUMBER_FORMAT = /^([a-z]|\d){3}-?([a-z]|\d){2}$/i
   @@trains = []
@@ -49,6 +49,10 @@ class Train
     end
   end
 
+  def wagons_in_train(&block)
+    @wagons.each_with_index { |wagon, index| yield(wagon, index) }
+  end
+
   def valid?
     validate!
     true
@@ -59,7 +63,7 @@ class Train
   protected
 
   include CompanyName
-  attr_reader :speed, :wagons
+  attr_reader :speed
 
   def validate!
     raise "Number is invalid! Should be either xxx-xx or xxxxx" if @number !~ NUMBER_FORMAT

@@ -22,6 +22,8 @@ MENU = "Press either number what do you want to do:
            9 - Move the trains
           10 - Check stations list
           11 - Check trains list
+          12 - Fill the train or take a seat
+          13 - Check wagons list
            0 - Exit"
 
 @routes = []
@@ -60,7 +62,6 @@ end
 def create_route
   puts "Print name, initial station and destination (each on a new string):"
   name = gets.chomp
-  #raise "There is no such "
   first_station = find_obj(gets.chomp, Station.all)
   last_station = find_obj(gets.chomp, Station.all)
 
@@ -105,8 +106,18 @@ end
 def add_wagon
   print "Number of train: "
   train = Train.find(gets.chomp)
-  wagon = PassengerWagon.new if train.type == "passenger"
-  wagon = CargoWagon.new if train.type == "cargo" 
+
+  if train.type == "passenger"
+    print "How many seats the wagon has? "
+    seats = gets.chomp.to_i
+    wagon = PassengerWagon.new(seats)
+  end
+
+  if train.type == "cargo"
+    print "What is the volume of the wagon? (in litres) "
+    volume = gets.chomp.to_i
+    wagon = CargoWagon.new(volume)
+  end
 
   train.add_wagons(wagon)
 end
@@ -127,6 +138,25 @@ def move_train
   train.move_backward if input == "backward"
 end
 
+def fill_train
+  print "Number of train: "
+  train = Train.find(gets.chomp)
+
+  if train.type == "passenger"
+    print "Place in which wagon do you want to take? "
+    wagon = train.wagons[gets.chomp.to_i - 1]
+    wagon.take_place
+  end
+
+  if train.type == "cargo"
+    print "Which wagon do you want to fill? "
+    wagon = train.wagons[gets.chomp.to_i - 1]
+    print "How much volume do you want to fill the wagon with? (in litres) "
+    volume = gets.chomp.to_i
+    wagon.fill (volume)
+  end
+end
+
 def print_stations
   puts "Stations:"
   Station.all.each { |station| puts station.name }
@@ -136,10 +166,35 @@ def print_trains
   print "Station, please: "
   station = find_obj(gets.chomp, Station.all)
   puts "list of the trains: "
-  station.trains.each { |train| puts train.name }
+  block = lambda { |train| puts "#{train.number} #{train.type} #{train.wagons.count}" }
+  station.trains_on_station(&block)
 end
 
+def print_wagons
+  print "Number of train: "
+  train = Train.find(gets.chomp)
+  if train.type == "passenger"
+    block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free_seats} #{wagon.taken_seats}" }
+  end
+  if train.type == "cargo"
+    block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free_space} #{wagon.filled_space}" }
+  end
+  
+  train.wagons_in_train(&block)
+end
+
+def seed
+  Station.new("Samara")
+  Station.new("Moscow")
+  Station.new("Peter")
+  PassengerTrain.new("12345")
+  CargoTrain.new("23456")
+  PassengerTrain.new("34567")
+  CargoTrain.new("45678")
+end
+  
 puts MENU
+seed
 loop do
   number = gets.chomp.to_i
   case number
@@ -165,6 +220,10 @@ loop do
     print_stations
   when 11
     print_trains
+  when 12
+    fill_train
+  when 13
+    print_wagons
   when 0
     break
   end

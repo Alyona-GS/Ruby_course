@@ -1,6 +1,6 @@
 class PassengerTrain < Train
 #public cause user access these
-  def initialize(name)
+  def initialize(number)
     @type = "passenger"
     super
   end

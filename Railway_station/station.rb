@@ -26,6 +26,10 @@ class Station
     @trains << train
   end
 
+  def trains_on_station(&block)
+    @trains.each { |train| yield(train) }
+  end
+
   def valid?
     validate!
     true
