@@ -109,14 +109,12 @@ def add_wagon
 
   if train.type == "passenger"
     print "How many seats the wagon has? "
-    seats = gets.chomp.to_i
-    wagon = PassengerWagon.new(seats)
+    wagon = PassengerWagon.new(gets.chomp.to_i)
   end
 
   if train.type == "cargo"
     print "What is the volume of the wagon? (in litres) "
-    volume = gets.chomp.to_i
-    wagon = CargoWagon.new(volume)
+    wagon = CargoWagon.new(gets.chomp.to_i)
   end
 
   train.add_wagons(wagon)
@@ -144,16 +142,14 @@ def fill_train
 
   if train.type == "passenger"
     print "Place in which wagon do you want to take? "
-    wagon = train.wagons[gets.chomp.to_i - 1]
-    wagon.take_place
+    train.wagons[gets.chomp.to_i - 1].fill
   end
 
   if train.type == "cargo"
     print "Which wagon do you want to fill? "
     wagon = train.wagons[gets.chomp.to_i - 1]
     print "How much volume do you want to fill the wagon with? (in litres) "
-    volume = gets.chomp.to_i
-    wagon.fill (volume)
+    wagon.fill (gets.chomp.to_i)
   end
 end
 
@@ -173,24 +169,41 @@ end
 def print_wagons
   print "Number of train: "
   train = Train.find(gets.chomp)
-  if train.type == "passenger"
-    block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free_seats} #{wagon.taken_seats}" }
-  end
-  if train.type == "cargo"
-    block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free_space} #{wagon.filled_space}" }
-  end
-  
+  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
   train.wagons_in_train(&block)
 end
 
 def seed
-  Station.new("Samara")
-  Station.new("Moscow")
-  Station.new("Peter")
-  PassengerTrain.new("12345")
-  CargoTrain.new("23456")
-  PassengerTrain.new("34567")
-  CargoTrain.new("45678")
+  st1 = Station.new("Samara")
+  st2 = Station.new("Moscow")
+
+  tr1 = PassengerTrain.new("12345")
+  tr2 = CargoTrain.new("23456")
+
+  @routes << Route.new("SAM-MSK", st1, st2)
+
+  tr1.receive_route(@routes[0])
+  tr2.receive_route(@routes[0])
+
+  tr1.add_wagons(PassengerWagon.new(70))
+  tr1.add_wagons(PassengerWagon.new(80))
+
+  tr2.add_wagons(CargoWagon.new(90))
+  tr2.add_wagons(CargoWagon.new(60))
+
+  block = lambda { |train| puts "#{train.number} #{train.type} #{train.wagons.count}" }
+  st1.trains_on_station(&block)
+
+  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
+  tr1.wagons_in_train(&block)
+  tr2.wagons_in_train(&block)
+
+  tr1.wagons[0].fill
+  tr2.wagons[1].fill(40)
+
+  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
+  tr1.wagons_in_train(&block)
+  tr2.wagons_in_train(&block)
 end
   
 puts MENU

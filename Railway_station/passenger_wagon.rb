@@ -1,16 +1,13 @@
 class PassengerWagon < Wagon
-  attr_accessor :taken_seats, :free_seats
   attr_reader :type
 
-  def initialize(seats)
+  def initialize(volume)
     @type = "passenger"
-    @seats = seats
-    @taken_seats = 0
-    @free_seats= seats
+    super
   end
 
-  def take_place
-    self.taken_seats += 1
-    self.free_seats = @seats - self.taken_seats
+  def fill
+    self.taken += 1
+    self.free = @volume - self.taken
   end
 end
