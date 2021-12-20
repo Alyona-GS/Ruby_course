@@ -6,8 +6,8 @@ class CargoWagon < Wagon
     super
   end
 
-  def fill (volume)
+  def fill(volume)
     self.taken += volume
-    self.free = @volume - self.taken
+    super()
   end
 end

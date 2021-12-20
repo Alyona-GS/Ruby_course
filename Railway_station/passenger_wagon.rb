@@ -8,6 +8,6 @@ class PassengerWagon < Wagon
 
   def fill
     self.taken += 1
-    self.free = @volume - self.taken
+    super
   end
 end
