@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module InstanceCounter
   def self.included(base)
     base.extend ClassMethods
@@ -11,7 +13,6 @@ module InstanceCounter
   end
 
   module InstanceMethods
-    
     @@counter = 0
 
     private

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Station
   include InstanceCounter
 
@@ -27,20 +29,20 @@ class Station
   end
 
   def trains_on_station(&block)
-    @trains.each { |train| yield(train) }
+    @trains.each(&block)
   end
 
   def valid?
     validate!
     true
-  rescue
+  rescue StandardError
     false
   end
 
   protected
 
   def validate!
-    raise "The name of the city should be at least 3 letter length!" if @name.length < 3
+    raise 'The name of the city should be at least 3 letter length!' if @name.length < 3
   end
 
   private

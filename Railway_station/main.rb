@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'instance_counter'
 require_relative 'company_name'
 
@@ -10,6 +12,8 @@ require_relative 'wagon'
 require_relative 'passenger_wagon'
 require_relative 'cargo_wagon'
 
+require_relative 'seed'
+
 MENU = "Press either number what do you want to do:
            1 - Create a new station
            2 - Create a new train
@@ -19,225 +23,193 @@ MENU = "Press either number what do you want to do:
            6 - Bind the route to the train
            7 - Add the wagons
            8 - Remove the wagons
-           9 - Move the trains
-          10 - Check stations list
-          11 - Check trains list
-          12 - Fill the train or take a seat
-          13 - Check wagons list
+           9 - Move the train forward
+          10 - Move the train backward
+          11 - Check stations list
+          12 - Check trains list
+          13 - Fill the train or take a seat
+          14 - Check wagons list
            0 - Exit"
+
+STATION_MESS = ['Station: ', 'Initial station: ', 'Destination: '].freeze
+TRAIN_MESS = ['Number of train: ', 'Which type of train to create? (passenger/cargo): '].freeze
+ROUTE_MESS = ['Route: ', 'Put name, initial station and destination: '].freeze
+PASS_WAGON_MESS = ['How many seats the wagon has? ', 'Place in which wagon do you want to take? '].freeze
+CAR_WAGON_MESS = ['What is the volume of the wagon? (in litres) ', 'Which wagon do you want to fill? ',
+                  'How much volume do you want to fill the wagon with? (in litres) '].freeze
 
 @routes = []
 
-#public, no class is in here
-def find_obj(obj, obj_arr)
-  obj_arr.find { |x| x.name == obj }
+def confirm_message(num, options = {})
+  case num.to_i
+  when 0 then puts "The station #{options[:name]} has been created!"
+  when 1 then puts "The #{options[:type]} train #{options[:number]} has been created!"
+  when 2 then puts "Route #{options[:name]} has been created!"
+  end
+end
+
+def find_station
+  print STATION_MESS[0]
+  station = gets.chomp
+  Station.all.find { |x| x.name == station }
+end
+
+def find_train
+  print TRAIN_MESS[0]
+  Train.find(gets.chomp)
+end
+
+def find_route
+  print ROUTE_MESS[0]
+  route = gets.chomp
+  @routes.find { |x| x.name == route }
+end
+
+def train_type
+  print TRAIN_MESS[1]
+  type = gets.chomp
+  raise 'The type is incorrect!' unless %w[passenger cargo].include?(type)
+
+  type
+end
+
+def passenger_wagon
+  print PASS_WAGON_MESS[0]
+  PassengerWagon.new(gets.chomp.to_i)
+end
+
+def cargo_wagon
+  print CAR_WAGON_MESS[0]
+  CargoWagon.new(gets.chomp.to_i)
+end
+
+def fill_passenger_train
+  print PASS_WAGON_MESS[1]
+  train.wagons[gets.chomp.to_i - 1].fill
+end
+
+def fill_cargo_train
+  print CAR_WAGON_MESS[1]
+  wagon = train.wagons[gets.chomp.to_i - 1]
+  print CAR_WAGON_MESS[2]
+  wagon.fill(gets.chomp.to_i)
+end
+
+def print_route(route)
+  puts 'Your route:'
+  route.stations.each { |s| puts s.name }
+end
+
+def input(message)
+  print message
+  gets.chomp
 end
 
 def create_station
-  print "Put the name of the station: "
-  name = gets.chomp
+  name = input(STATION_MESS[0])
   Station.new(name)
-  puts "The station #{name} has been created!"
-  rescue StandardError => e
-    puts e.message
-    retry
+  confirm_message(0, name: name)
+rescue StandardError => e
+  puts e.message
+  retry
 end
 
 def create_train
-  print "Which type of train to create? (passenger/cargo): "
-  type = gets.chomp
-  raise "The type is incorrect!" unless type == "passenger" || type == "cargo"
-
-  print "Print the number of the train: "
-  number = gets.chomp
-
-  PassengerTrain.new(number) if type == "passenger"
-  CargoTrain.new(number) if type == "cargo"
-  puts "The #{type} train #{number} has been created!"
-  rescue StandardError => e
-    puts e.message
-    retry
+  type = train_type
+  number = input(TRAIN_MESS[0])
+  PassengerTrain.new(number) if type == 'passenger'
+  CargoTrain.new(number) if type == 'cargo'
+  confirm_message(1, number: number, type: type)
+rescue StandardError => e
+  puts e.message
+  retry
 end
 
 def create_route
-  puts "Print name, initial station and destination (each on a new string):"
-  name = gets.chomp
-  first_station = find_obj(gets.chomp, Station.all)
-  last_station = find_obj(gets.chomp, Station.all)
-
-  @routes << Route.new(name, first_station, last_station)
-  puts "Route #{name} has been created!"
-  rescue StandardError => e
-    puts e.message
-    retry
+  name = input(ROUTE_MESS[1])
+  @routes << Route.new(name, find_station, find_station)
+  confirm_message(2, name: name)
+rescue StandardError => e
+  puts e.message
+  retry
 end
 
 def insert_station
-  print "Which route do you want to update? "
-  route = find_obj(gets.chomp, @routes)
-  print "The name of the station to be added: "
-  station = find_obj(gets.chomp, Station.all)
-
+  route = find_route
+  station = find_station
   route.add_station(station)
-
-  puts "Your route:"
-  route.stations.each { |station| puts station.name }
+  print_route(route)
 end
 
 def remove_station
-  print "Which route do you want to update? "
-  route = find_obj(gets.chomp, @routes)
-  print "The name of the station to be removed: "
-  station = find_obj(gets.chomp, route.stations)
-
+  route = find_route
+  station = find_station
   route.delete_station(station)
-
-  puts "Your route:"
-  route.stations.each { |station| puts station.name }
+  print_route(route)
 end
 
 def bind_route
-  puts "Print the route and a train you do want to bind (each on a new string):"
-  route = find_obj(gets.chomp, @routes)
-  train = Train.find(gets.chomp)
+  route = find_route
+  train = find_train
   train.receive_route(route)
 end
 
 def add_wagon
-  print "Number of train: "
-  train = Train.find(gets.chomp)
-
-  if train.type == "passenger"
-    print "How many seats the wagon has? "
-    wagon = PassengerWagon.new(gets.chomp.to_i)
-  end
-
-  if train.type == "cargo"
-    print "What is the volume of the wagon? (in litres) "
-    wagon = CargoWagon.new(gets.chomp.to_i)
-  end
-
+  train = find_train
+  wagon = passenger_wagon if train.type == 'passenger'
+  wagon = cargo_wagon if train.type == 'cargo'
   train.add_wagons(wagon)
 end
 
 def remove_wagon
-  print "Number of train: "
-  train = Train.find(gets.chomp)
+  train = find_train
   train.remove_wagons
 end
 
-def move_train
-  print "Number of train you want to move: "
-  train = Train.find(gets.chomp)
-  print "Backward or forward? (backward/forward): "
-  input = gets.chomp
+def forward
+  train = find_train
+  train.move_forward
+end
 
-  train.move_forward if input == "forward"
-  train.move_backward if input == "backward"
+def backward
+  train = find_train
+  train.move_backward
 end
 
 def fill_train
-  print "Number of train: "
-  train = Train.find(gets.chomp)
-
-  if train.type == "passenger"
-    print "Place in which wagon do you want to take? "
-    train.wagons[gets.chomp.to_i - 1].fill
-  end
-
-  if train.type == "cargo"
-    print "Which wagon do you want to fill? "
-    wagon = train.wagons[gets.chomp.to_i - 1]
-    print "How much volume do you want to fill the wagon with? (in litres) "
-    wagon.fill (gets.chomp.to_i)
-  end
+  train = find_train
+  fill_passenger_train if train.type == 'passenger'
+  fill_cargo_train if train.type == 'cargo'
 end
 
 def print_stations
-  puts "Stations:"
-  Station.all.each { |station| puts station.name }
+  puts 'Stations:'
+  Station.all.each { |s| puts s.name }
 end
 
 def print_trains
-  print "Station, please: "
-  station = find_obj(gets.chomp, Station.all)
-  puts "list of the trains: "
-  block = lambda { |train| puts "#{train.number} #{train.type} #{train.wagons.count}" }
+  station = find_station
+  puts 'list of the trains: '
+  block = ->(train) { puts "#{train.number} #{train.type} #{train.wagons.count}" }
   station.trains_on_station(&block)
 end
 
 def print_wagons
-  print "Number of train: "
-  train = Train.find(gets.chomp)
-  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
+  train = find_train
+  block = ->(wagon, index) { puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
   train.wagons_in_train(&block)
 end
 
-def seed
-  st1 = Station.new("Samara")
-  st2 = Station.new("Moscow")
+@choise = { '1' => :create_station, '2' => :create_train, '3' => :create_route, '4' => :insert_station,
+            '5' => :remove_station, '6' => :bind_route, '7' => :add_wagon, '8' => :remove_wagon,
+            '9' => :forward, '10' => :backward, '11' => :print_stations, '12' => :print_trains,
+            '13' => :fill_train, '14' => :print_wagons }
 
-  tr1 = PassengerTrain.new("12345")
-  tr2 = CargoTrain.new("23456")
-
-  @routes << Route.new("SAM-MSK", st1, st2)
-
-  tr1.receive_route(@routes[0])
-  tr2.receive_route(@routes[0])
-
-  tr1.add_wagons(PassengerWagon.new(70))
-  tr1.add_wagons(PassengerWagon.new(80))
-
-  tr2.add_wagons(CargoWagon.new(90))
-  tr2.add_wagons(CargoWagon.new(60))
-
-  block = lambda { |train| puts "#{train.number} #{train.type} #{train.wagons.count}" }
-  st1.trains_on_station(&block)
-
-  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
-  tr1.wagons_in_train(&block)
-  tr2.wagons_in_train(&block)
-
-  tr1.wagons[0].fill
-  tr2.wagons[1].fill(40)
-
-  block = lambda { |wagon, index| puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
-  tr1.wagons_in_train(&block)
-  tr2.wagons_in_train(&block)
-end
-  
 puts MENU
 seed
 loop do
-  number = gets.chomp.to_i
-  case number
-  when 1
-    create_station
-  when 2
-    create_train
-  when 3
-    create_route
-  when 4
-    insert_station
-  when 5
-    remove_station
-  when 6
-    bind_route
-  when 7
-    add_wagon
-  when 8
-    remove_wagon
-  when 9
-    move_train
-  when 10
-    print_stations
-  when 11
-    print_trains
-  when 12
-    fill_train
-  when 13
-    print_wagons
-  when 0
-    break
-  end
+  number = gets.chomp
+  break if @choise[number].nil?
+
+  send(@choise[number])
 end

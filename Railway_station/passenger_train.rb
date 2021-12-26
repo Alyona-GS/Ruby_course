@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 class PassengerTrain < Train
-#public cause user access these
   def initialize(number)
-    @type = "passenger"
+    @type = 'passenger'
     super
   end
 end

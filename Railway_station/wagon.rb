@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Wagon
   include CompanyName
 
@@ -11,6 +13,6 @@ class Wagon
   end
 
   def fill
-    @free = @volume - @taken
+    @free = @volume - taken
   end
 end

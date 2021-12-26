@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class Train
   include InstanceCounter
 
   attr_reader :type, :number, :trains, :wagons
 
-  NUMBER_FORMAT = /^([a-z]|\d){3}-?([a-z]|\d){2}$/i
+  NUMBER_FORMAT = /^([a-z]|\d){3}-?([a-z]|\d){2}$/i.freeze
   @@trains = []
 
   def self.find(number)
@@ -20,7 +22,7 @@ class Train
   end
 
   def add_wagons(wagon)
-    self.wagons << wagon if @speed.zero?
+    wagons << wagon if @speed.zero?
   end
 
   def remove_wagons
@@ -34,29 +36,29 @@ class Train
   end
 
   def move_forward
-    unless @route.stations[@current_station_index] == @route.stations.last
-      @route.stations[@current_station_index].train_departure(self)
-      @current_station_index += 1 
-      @route.stations[@current_station_index].train_arrival(self)
-    end
+    return if @route.stations[@current_station_index] == @route.stations.last
+
+    @route.stations[@current_station_index].train_departure(self)
+    @current_station_index += 1
+    @route.stations[@current_station_index].train_arrival(self)
   end
 
   def move_backward
-    unless @current_station_index == 0
-      @route.stations[@current_station_index].train_departure(self)
-      @current_station_index -= 1 
-      @route.stations[@current_station_index].train_arrival(self)
-    end
+    return if @current_station_index.zero?
+
+    @route.stations[@current_station_index].train_departure(self)
+    @current_station_index -= 1
+    @route.stations[@current_station_index].train_arrival(self)
   end
 
   def wagons_in_train(&block)
-    @wagons.each_with_index { |wagon, index| yield(wagon, index) }
+    @wagons.each_with_index(&block)
   end
 
   def valid?
     validate!
     true
-  rescue
+  rescue StandardError
     false
   end
 
@@ -66,7 +68,7 @@ class Train
   attr_reader :speed
 
   def validate!
-    raise "Number is invalid! Should be either xxx-xx or xxxxx" if @number !~ NUMBER_FORMAT
+    raise 'Number is invalid! Should be either xxx-xx or xxxxx' if @number !~ NUMBER_FORMAT
   end
 
   private
@@ -88,6 +90,6 @@ class Train
   end
 
   def previous_station
-    @route.stations[@current_station_index - 1] if @current_station_index > 0
+    @route.stations[@current_station_index - 1] if @current_station_index.positive?
   end
 end
