@@ -21,7 +21,7 @@ module Validation
         error = ERRORS[:incorr_format] if name !~ args[0]
 
       when :type
-        error = ERRORS[:no_match_class] unless name.class == args[0]
+        error = ERRORS[:no_match_class] unless name.instance_of?(args[0])
       end
       error
     end
@@ -30,15 +30,13 @@ module Validation
   module InstanceMethods
     def validate!
       errors = []
-      if self.class == Route
+      if instance_of?(Route)
         errors << self.class.validate(name, :format, ROUTE_FORMAT)
         errors << self.class.validate(stations.compact, :presence)
-        errors << "At least one station does not exist" unless stations.compact.length == 2
+        errors << 'At least one station does not exist' unless stations.compact.length == 2
       end
-      if self.class == Station
-        errors << self.class.validate(name, :type, String)
-      end
-      if self.class == CargoTrain || self.class == PassengerTrain
+      errors << self.class.validate(name, :type, String) if instance_of?(Station)
+      if instance_of?(CargoTrain) || instance_of?(PassengerTrain)
         errors << self.class.validate(number, :format, TRAIN_FORMAT)
       end
       errors.compact!

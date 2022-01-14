@@ -20,7 +20,7 @@ module Accessors
     var_name = "@#{name}".to_sym
     define_method(name) { instance_variable_get(var_name) }
     define_method("#{name}=".to_sym) do |value|
-      if var_name.class == input_class
+      if var_name.instance_of?(input_class)
         instance_variable_set(var_name, value)
       else
         self.class.send(:raise, StandardError)

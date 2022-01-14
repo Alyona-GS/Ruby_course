@@ -2,7 +2,8 @@
 
 class Train
   extend Accessors
-  include InstanceCounter, Validation
+  include Validation
+  include InstanceCounter
 
   attr_reader :type, :number, :trains, :wagons
 

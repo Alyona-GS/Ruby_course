@@ -2,9 +2,11 @@
 
 class Route
   extend Accessors
-  include InstanceCounter, Validation
+  include Validation
+  include InstanceCounter
 
   attr_reader :name
+
   attr_accessor_with_history :stations
 
   def initialize(name, first_station, last_station)
@@ -15,10 +17,10 @@ class Route
   end
 
   def add_station(station)
-    self.stations.insert(-2, station)
+    stations.insert(-2, station)
   end
 
   def delete_station(station)
-    self.stations.delete(station) unless station == stations.last || station == stations.first
+    stations.delete(station) unless station == stations.last || station == stations.first
   end
 end
