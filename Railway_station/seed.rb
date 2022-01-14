@@ -3,12 +3,16 @@
 def seed
   st1 = Station.new('Samara')
   st2 = Station.new('Moscow')
+  st3 = Station.new('Peter')
 
   tr1 = PassengerTrain.new('12345')
   tr2 = CargoTrain.new('23456')
 
   @routes << Route.new('SAM-MSK', st1, st2)
+  @routes[0].add_station(st3)
+  puts @routes[0].stations_history
 
+=begin
   tr1.receive_route(@routes[0])
   tr2.receive_route(@routes[0])
 
@@ -31,4 +35,5 @@ def seed
   block = ->(wagon, index) { puts "#{index + 1} #{wagon.type} #{wagon.free} #{wagon.taken}" }
   tr1.wagons_in_train(&block)
   tr2.wagons_in_train(&block)
+=end
 end

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Train
-  include InstanceCounter
+  extend Accessors
+  include InstanceCounter, Validation
 
   attr_reader :type, :number, :trains, :wagons
 
-  NUMBER_FORMAT = /^([a-z]|\d){3}-?([a-z]|\d){2}$/i.freeze
   @@trains = []
 
   def self.find(number)
@@ -55,21 +55,10 @@ class Train
     @wagons.each_with_index(&block)
   end
 
-  def valid?
-    validate!
-    true
-  rescue StandardError
-    false
-  end
-
   protected
 
   include CompanyName
   attr_reader :speed
-
-  def validate!
-    raise 'Number is invalid! Should be either xxx-xx or xxxxx' if @number !~ NUMBER_FORMAT
-  end
 
   private
 

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Station
-  include InstanceCounter
-
-  attr_accessor :name
-  attr_reader :trains
+  extend Accessors
+  include InstanceCounter, Validation
+  
+  attr_reader :name, :trains
 
   @@stations = []
 
@@ -30,19 +30,6 @@ class Station
 
   def trains_on_station(&block)
     @trains.each(&block)
-  end
-
-  def valid?
-    validate!
-    true
-  rescue StandardError
-    false
-  end
-
-  protected
-
-  def validate!
-    raise 'The name of the city should be at least 3 letter length!' if @name.length < 3
   end
 
   private

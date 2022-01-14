@@ -2,6 +2,8 @@
 
 require_relative 'instance_counter'
 require_relative 'company_name'
+require_relative 'accessors'
+require_relative 'validation'
 
 require_relative 'station'
 require_relative 'route'
@@ -29,6 +31,7 @@ MENU = "Press either number what do you want to do:
           12 - Check trains list
           13 - Fill the train or take a seat
           14 - Check wagons list
+          15 - History of the route
            0 - Exit"
 
 STATION_MESS = ['Station: ', 'Initial station: ', 'Destination: '].freeze
@@ -110,7 +113,7 @@ def create_station
   Station.new(name)
   confirm_message(0, name: name)
 rescue StandardError => e
-  puts e.message
+  puts e
   retry
 end
 
@@ -121,7 +124,7 @@ def create_train
   CargoTrain.new(number) if type == 'cargo'
   confirm_message(1, number: number, type: type)
 rescue StandardError => e
-  puts e.message
+  puts e
   retry
 end
 
@@ -200,10 +203,15 @@ def print_wagons
   train.wagons_in_train(&block)
 end
 
+def route_history
+  route = find_route
+  puts route.stations_history
+end
+
 @choise = { '1' => :create_station, '2' => :create_train, '3' => :create_route, '4' => :insert_station,
             '5' => :remove_station, '6' => :bind_route, '7' => :add_wagon, '8' => :remove_wagon,
             '9' => :forward, '10' => :backward, '11' => :print_stations, '12' => :print_trains,
-            '13' => :fill_train, '14' => :print_wagons }
+            '13' => :fill_train, '14' => :print_wagons, '15' => :route_history }
 
 puts MENU
 seed
