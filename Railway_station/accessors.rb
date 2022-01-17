@@ -2,15 +2,16 @@ module Accessors
   def attr_accessor_with_history(*names)
     names.each do |name|
       var_name = "@#{name}".to_sym
-      var_arr = "@#{name}_arr".to_sym
-      instance_variable_set(var_arr, [])
+      var_arr = "@#{name}_history".to_sym
+
       define_method(name) { instance_variable_get(var_name) }
+
       define_method("#{name}_history".to_sym) { instance_variable_get(var_arr) }
+
       define_method("#{name}=".to_sym) do |value|
-        arr = instance_variable_get(var_arr)
-        arr << instance_variable_get(var_name) if arr.empty?
-        instance_variable_set(var_name, value)
+        arr = instance_variable_get(var_arr) || [instance_variable_get(var_name)]
         arr << value
+        instance_variable_set(var_name, value)
         instance_variable_set(var_arr, arr)
       end
     end
@@ -20,11 +21,13 @@ module Accessors
     var_name = "@#{name}".to_sym
     define_method(name) { instance_variable_get(var_name) }
     define_method("#{name}=".to_sym) do |value|
-      if var_name.instance_of?(input_class)
+      if value.instance_of?(input_class)
         instance_variable_set(var_name, value)
       else
-        self.class.send(:raise, StandardError)
+        self.class.send(:raise, "Incorrect data type")
       end
+      rescue RuntimeError => e
+        puts e.message
     end
   end
 end

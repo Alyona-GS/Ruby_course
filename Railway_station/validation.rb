@@ -30,15 +30,19 @@ module Validation
   module InstanceMethods
     def validate!
       errors = []
+
       if instance_of?(Route)
         errors << self.class.validate(name, :format, ROUTE_FORMAT)
         errors << self.class.validate(stations.compact, :presence)
         errors << 'At least one station does not exist' unless stations.compact.length == 2
       end
+
       errors << self.class.validate(name, :type, String) if instance_of?(Station)
+
       if instance_of?(CargoTrain) || instance_of?(PassengerTrain)
-        errors << self.class.validate(number, :format, TRAIN_FORMAT)
+       errors << self.class.validate(number, :format, TRAIN_FORMAT)
       end
+
       errors.compact!
       raise errors.join('; ') unless errors.empty?
     end

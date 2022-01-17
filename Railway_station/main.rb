@@ -113,7 +113,7 @@ def create_station
   Station.new(name)
   confirm_message(0, name: name)
 rescue StandardError => e
-  puts e
+  puts e.message
   retry
 end
 
@@ -124,7 +124,7 @@ def create_train
   CargoTrain.new(number) if type == 'cargo'
   confirm_message(1, number: number, type: type)
 rescue StandardError => e
-  puts e
+  puts e.message
   retry
 end
 

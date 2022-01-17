@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Wagon
+  extend Accessors
   include CompanyName
 
-  attr_accessor :taken
+  strong_attr_accessor :taken, Integer
   attr_reader :free
 
   def initialize(volume)

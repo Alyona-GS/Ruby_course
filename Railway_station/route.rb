@@ -17,10 +17,18 @@ class Route
   end
 
   def add_station(station)
-    stations.insert(-2, station)
+    self.stations = stations.safe_insert(-2, station)
   end
 
   def delete_station(station)
-    stations.delete(station) unless station == stations.last || station == stations.first
+    self.stations = stations.reject { |s| s == station } unless station == stations.last || station == stations.first
   end
 end
+
+class Array
+  def safe_insert(pos, obj_to_insert)
+    arr = Marshal.load(Marshal.dump(self))
+    arr.insert(pos, obj_to_insert)
+  end
+end
+
