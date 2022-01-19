@@ -2,10 +2,15 @@
 
 class Train
   extend Accessors
-  include Validation
-  include InstanceCounter
+  include Validation,
+          InstanceCounter
 
-  attr_reader :type, :number, :trains, :wagons
+  attr_reader :type,
+              :number,
+              :trains,
+              :wagons
+
+  validate :number, :format, /^([a-z]|\d){3}-?([a-z]|\d){2}$/i
 
   @@trains = []
 

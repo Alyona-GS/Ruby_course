@@ -4,7 +4,7 @@ class CargoWagon < Wagon
   attr_reader :type
 
   def initialize(volume)
-    @type = 'cargo'
+    @type = :cargo
     super
   end
 

@@ -2,10 +2,14 @@
 
 class Station
   extend Accessors
-  include Validation
-  include InstanceCounter
 
-  attr_reader :name, :trains
+  include Validation,
+          InstanceCounter
+
+  attr_reader :name,
+              :trains
+
+  validate :name, :type, String
 
   @@stations = []
 
@@ -14,7 +18,7 @@ class Station
   end
 
   def initialize(name)
-    @name = name
+    @name   = name
     @trains = []
     validate!
     @@stations << self
@@ -30,12 +34,12 @@ class Station
   end
 
   def trains_on_station(&block)
-    @trains.each(&block)
+    self.trains.each(&block)
   end
 
   private
 
   def trains_by_type(type)
-    @trains.select { |train| train.type == type }.count
+    self.trains.select { |train| train.type == type }.count
   end
 end

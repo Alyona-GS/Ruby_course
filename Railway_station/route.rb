@@ -2,15 +2,17 @@
 
 class Route
   extend Accessors
-  include Validation
-  include InstanceCounter
+  include Validation,
+          InstanceCounter
 
   attr_reader :name
-
   attr_accessor_with_history :stations
 
+  validate :name, :presence
+  validate :name, :format, /^[A-Z]{3}-[A-Z]{3}$/
+
   def initialize(name, first_station, last_station)
-    @name = name
+    @name     = name
     @stations = [first_station, last_station]
     validate!
     register_instances
@@ -21,7 +23,13 @@ class Route
   end
 
   def delete_station(station)
-    self.stations = stations.reject { |s| s == station } unless station == stations.last || station == stations.first
+    return if station == stations.last || station == stations.first
+    self.stations = stations.reject { |s| s == station }
+  end
+
+  def validate!
+    super
+    raise 'At least one station does not exist' unless stations.compact.length == 2
   end
 end
 
