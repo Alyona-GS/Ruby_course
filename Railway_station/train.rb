@@ -2,8 +2,9 @@
 
 class Train
   extend Accessors
-  include Validation,
-          InstanceCounter
+  include MessageSystem
+  include InstanceCounter
+  include Validation
 
   attr_reader :type,
               :number,
@@ -23,6 +24,8 @@ class Train
     @speed = 0
     @wagons = []
     validate!
+    raise EXCEPT[:double] unless Train.find(number).nil?
+
     @@trains << self
     register_instances
   end
@@ -32,17 +35,21 @@ class Train
   end
 
   def remove_wagons
-    @wagons.delete_at(-1) if @speed.zero? && @wagons.any?
+    raise EXCEPT[:no_wagons] if @wagons.empty?
+
+    @wagons.delete_at(-1) if @speed.zero?
   end
 
   def receive_route(route)
+    @route.stations[@current_station_index].train_departure(self) unless @current_station_index.nil?
     @route = route
     @current_station_index = 0
     @route.stations[@current_station_index].train_arrival(self)
   end
 
   def move_forward
-    return if @route.stations[@current_station_index] == @route.stations.last
+    last_st = @route.stations[@current_station_index] == @route.stations.last
+    raise EXCEPT[:the_end] if last_st
 
     @route.stations[@current_station_index].train_departure(self)
     @current_station_index += 1
@@ -50,7 +57,7 @@ class Train
   end
 
   def move_backward
-    return if @current_station_index.zero?
+    raise EXCEPT[:the_start] if @current_station_index.zero?
 
     @route.stations[@current_station_index].train_departure(self)
     @current_station_index -= 1

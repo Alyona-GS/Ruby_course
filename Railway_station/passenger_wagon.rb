@@ -9,7 +9,7 @@ class PassengerWagon < Wagon
   end
 
   def fill
-    self.taken += 1
+    self.taken = 1
     super
   end
 end

@@ -14,6 +14,10 @@ class Wagon
   end
 
   def fill
-    @free = @volume - taken
+    diff = @free - taken
+    raise "You can't fill more its limit" if diff.negative?
+
+    @free = diff
+    self.taken = @volume - @free
   end
 end

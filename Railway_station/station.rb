@@ -3,13 +3,14 @@
 class Station
   extend Accessors
 
-  include Validation,
-          InstanceCounter
+  include MessageSystem
+  include InstanceCounter
+  include Validation
 
   attr_reader :name,
               :trains
 
-  validate :name, :type, String
+  validate :name, :format, /^[a-zA-Z]+$/
 
   @@stations = []
 
@@ -17,10 +18,16 @@ class Station
     @@stations
   end
 
+  def self.find(name)
+    Station.all.find { |x| x.name == name }
+  end
+
   def initialize(name)
     @name   = name
     @trains = []
     validate!
+    raise EXCEPT[:double] unless Station.find(name).nil?
+
     @@stations << self
     register_instances
   end
@@ -34,12 +41,12 @@ class Station
   end
 
   def trains_on_station(&block)
-    self.trains.each(&block)
+    trains.each(&block)
   end
 
   private
 
   def trains_by_type(type)
-    self.trains.select { |train| train.type == type }.count
+    trains.select { |train| train.type == type }.count
   end
 end

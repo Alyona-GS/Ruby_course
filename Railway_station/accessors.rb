@@ -24,10 +24,10 @@ module Accessors
       if value.instance_of?(input_class)
         instance_variable_set(var_name, value)
       else
-        self.class.send(:raise, "Incorrect data type")
+        self.class.send(:raise, 'Incorrect data type')
       end
-      rescue RuntimeError => e
-        puts e.message
+    rescue RuntimeError => e
+      puts e.message
     end
   end
 end
