@@ -3,8 +3,10 @@ module TrainInterface
   include MessageSystem
 
   def create_passenger_train
-    print MESSAGES[:train][:general]
-    train = PassengerTrain.new(gets.chomp)
+    print MESS[:train][:basic]
+    number = gets.strip
+    raise EXCEPT[:double] unless Train.find(number).nil?
+    train = PassengerTrain.new(number)
     success_message(:train, number: train.number, type: 'passenger')
   rescue StandardError => e
     puts e.message
@@ -12,8 +14,10 @@ module TrainInterface
   end
 
   def create_cargo_train
-    print MESSAGES[:train][:general]
-    train = CargoTrain.new(gets.chomp)
+    print MESS[:train][:basic]
+    number = gets.strip
+    raise EXCEPT[:double] unless Train.find(number).nil?
+    train = CargoTrain.new(number)
     success_message(:train, number: train.number, type: 'cargo')
   rescue StandardError => e
     puts e.message

@@ -2,7 +2,8 @@
 
 class Wagon
   extend Accessors
-  include CompanyName
+  include CompanyName,
+          MessageSystem
 
   strong_attr_accessor :taken, Integer
   attr_reader :free
@@ -15,7 +16,7 @@ class Wagon
 
   def fill
     diff = @free - taken
-    raise "You can't fill more its limit" if diff.negative?
+    raise EXCEPT[:limit] if diff.negative?
 
     @free = diff
     self.taken = @volume - @free

@@ -12,18 +12,18 @@ module WagonInterface
   end
 
   def create_passenger_wagon
-    print MESSAGES[:pass_wagon][:seats]
-    PassengerWagon.new(gets.chomp.to_i)
+    print MESS[:pass_wagon][:seats]
+    PassengerWagon.new(gets.strip.to_i)
   end
 
   def create_cargo_wagon
-    print MESSAGES[:car_wagon][:volume]
-    CargoWagon.new(gets.chomp.to_i)
+    print MESS[:car_wagon][:volume]
+    CargoWagon.new(gets.strip.to_i)
   end
 
   def find_wagon(train)
-    print MESSAGES[:wagon][:number]
-    wagon_number = gets.chomp.to_i
+    print MESS[:wagon][:number]
+    wagon_number = gets.strip.to_i
     raise EXCEPT[:pos_numb] unless wagon_number.positive?
     raise EXCEPT[:exist_numb] if train.wagons[wagon_number - 1].nil?
 
@@ -46,8 +46,8 @@ module WagonInterface
 
   def fill_cargo_train(train)
     wagon = find_wagon(train)
-    print MESSAGES[:car_wagon][:fill_volume]
-    wagon.fill(gets.chomp.to_i)
+    print MESS[:car_wagon][:fill]
+    wagon.fill(gets.strip.to_i)
   rescue StandardError => e
     puts e.message
   end

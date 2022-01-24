@@ -26,8 +26,6 @@ class Station
     @name   = name
     @trains = []
     validate!
-    raise EXCEPT[:double] unless Station.find(name).nil?
-
     @@stations << self
     register_instances
   end

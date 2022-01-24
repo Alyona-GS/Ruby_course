@@ -24,8 +24,6 @@ class Train
     @speed = 0
     @wagons = []
     validate!
-    raise EXCEPT[:double] unless Train.find(number).nil?
-
     @@trains << self
     register_instances
   end
@@ -35,7 +33,7 @@ class Train
   end
 
   def remove_wagons
-    raise EXCEPT[:no_wagons] if @wagons.empty?
+    raise EXCEPT[:no_wagons] if self.wagons.empty?
 
     @wagons.delete_at(-1) if @speed.zero?
   end
@@ -48,6 +46,7 @@ class Train
   end
 
   def move_forward
+    raise EXCEPT[:not_binded] if @route.nil?
     last_st = @route.stations[@current_station_index] == @route.stations.last
     raise EXCEPT[:the_end] if last_st
 
@@ -57,6 +56,7 @@ class Train
   end
 
   def move_backward
+    raise EXCEPT[:not_binded] if @route.nil?
     raise EXCEPT[:the_start] if @current_station_index.zero?
 
     @route.stations[@current_station_index].train_departure(self)

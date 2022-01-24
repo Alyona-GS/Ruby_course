@@ -3,8 +3,10 @@ module StationInterface
   include MessageSystem
 
   def create_station
-    print MESSAGES[:station][:general]
-    station = Station.new(gets.chomp)
+    print MESS[:station][:basic]
+    station = gets.strip.downcase.capitalize
+    raise EXCEPT[:double] unless Station.find(station).nil?
+    station = Station.new(station)
     success_message(:station, name: station.name)
   rescue StandardError => e
     puts e.message
@@ -12,7 +14,7 @@ module StationInterface
   end
 
   def print_stations
-    puts MESSAGES[:station][:all]
+    puts MESS[:station][:all]
     Station.all.each { |s| puts s.name }
   end
 

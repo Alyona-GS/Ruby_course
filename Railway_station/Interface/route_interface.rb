@@ -3,12 +3,13 @@ module RouteInterface
   include MessageSystem
 
   def create_route
-    puts MESSAGES[:route][:init_data]
-    route = gets.chomp
-    double = routes.find { |x| x.name == route }
-    raise EXCEPT[:double] if double
-
-    routes << Route.new(route, find_station, find_station)
+    print MESS[:route][:basic]
+    route = gets.strip
+    route_obj = @routes.find { |x| x.name == route }
+    raise EXCEPT[:double] unless route_obj.nil?
+    st_1  = find_station(MESS[:station][:first])
+    st_2  = find_station(MESS[:station][:last])
+    routes << Route.new(route, st_1, st_2)
     success_message(:route, name: routes.last.name)
   rescue StandardError => e
     puts e.message
@@ -35,15 +36,15 @@ module RouteInterface
   end
 
   def print_route(route)
-    puts MESSAGES[:route][:general]
-    route.stations.each { |s| puts s.name }
+    puts "#{MESS[:route][:basic]} #{route.name}"
+    route.stations.each { |s| print "#{s.name} " }
+    print "\n"
   end
 
   def route_history
     route = find_route
     if route.stations_history.nil?
-      route.stations.each { |s| print "#{s.name} " }
-      print "\n"
+      print_route(route)
       return
     end
     route.stations_history.each do |arr_st|
